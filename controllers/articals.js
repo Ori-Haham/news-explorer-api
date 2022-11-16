@@ -1,7 +1,10 @@
-const Article = require("../models/article");
-const NotFoundError = require("../errors/notFoundErr");
-const BadRequestError = require("../errors/BadRequestError");
-const noPermissionError = require("../errors/noPermissionError");
+const Article = require('../models/article');
+
+const {
+  BadRequestError,
+  NotFoundError,
+  NoPermissionError,
+} = require('../errors/errorClasses');
 
 module.exports.postNewArticle = (req, res, next) => {
   const { keyword, title, text, date, source, link, image } = req.body;
@@ -16,15 +19,11 @@ module.exports.postNewArticle = (req, res, next) => {
     owner: req.user.token,
   })
     .then((article) => {
-      try {
-        res.send(article);
-      } catch (err) {
-        next(err);
-      }
+      res.send(article);
     })
     .catch((err) => {
-      if (err.name === "ValidationError") {
-        next(new BadRequestError("Validation error"));
+      if (err.name === 'ValidationError') {
+        next(new BadRequestError('Validation error'));
       } else {
         next(err);
       }
@@ -33,7 +32,7 @@ module.exports.postNewArticle = (req, res, next) => {
 
 module.exports.getArticles = (req, res, next) => {
   Article.find({ owner: req.user.token })
-    .orFail(new NotFoundError("No articles found"))
+    .orFail(new NotFoundError('No articles found'))
     .then((article) => {
       res.send(article);
     })
@@ -42,15 +41,17 @@ module.exports.getArticles = (req, res, next) => {
 };
 
 module.exports.deleteArticle = (req, res, next) => {
-  Article.findByIdAndRemove(req.params.articleId)
-    .orFail(new NotFoundError("No article with matching ID found"))
+  Article.findById(req.params.articleId)
+    .orFail(new NotFoundError('No article with matching ID found'))
     .then((article) => {
-      if (article.owner != req.user.token) {
-        throw new noPermissionError(
-          "Forbiden : you have no permission to delete this article"
+      if (!article.owner.equals(req.user.token)) {
+        throw new NoPermissionError(
+          'Forbiden : you have no permission to delete this article',
         );
       }
-      res.send(article);
+      article.remove(() => {
+        res.send(article);
+      });
     })
     .catch(next);
 };

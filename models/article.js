@@ -1,9 +1,8 @@
-const mongoose = require("mongoose");
-const isEmail = require("validator/lib/isEmail");
+const mongoose = require('mongoose');
 
 const emailValidator = {
   validator: function validatorFunction(v) {
-    return /https?:\/\/(www\.)?\S+\.com(\S+)?/i.test(v);
+    return /https?:\/\/(www\.)?\S+\.(\S+)?/i.test(v);
   },
   message: (props) => `${props.value} is not a valid address!`,
 };
@@ -41,9 +40,9 @@ const articleSchema = new mongoose.Schema({
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "user",
+    ref: 'user',
     required: true,
   },
 });
 
-module.exports = mongoose.model("article", articleSchema);
+module.exports = mongoose.model('article', articleSchema);

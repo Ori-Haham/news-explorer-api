@@ -1,50 +1,55 @@
-const express = require("express");
-const bodyParser = require("body-parser");
-const cors = require("cors");
-const mongoose = require("mongoose");
+const express = require('express');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const mongoose = require('mongoose');
+const helmet = require('helmet');
+const { errors } = require('celebrate');
 
 const app = express();
 
-const { PORT = 3000 } = process.env;
+const { PORT = 3000, DB_ADDRESS = 'mongodb://localhost:27017/newExplorer-db' } =
+  process.env;
 
-const { postNewUser, login } = require("./controllers/users");
-const { userCredentialsValidator } = require("./middleware/userValidators");
-const { errors } = require("celebrate");
-const { requestLogger, errorLogger } = require("./middleware/logger");
-const auth = require("./middleware/auth");
-const usersRoute = require("./routes/users");
-const articalsRoute = require("./routes/articals");
+const { postNewUser, login } = require('./controllers/users');
+const { userCredentialsValidator } = require('./middleware/userValidators');
+const { requestLogger, errorLogger } = require('./middleware/logger');
+const auth = require('./middleware/auth');
+const indexRoute = require('./routes/index');
+const { NotFoundError } = require('./errors/errorClasses');
+const apiLimiter = require('./middleware/apiLimiter');
 
-mongoose.connect("mongodb://localhost:27017/newExplorer-db");
+mongoose.connect(DB_ADDRESS);
+
+app.use(apiLimiter);
+
+app.use(helmet());
 
 app.use(cors());
-app.options("*", cors());
+app.options('*', cors());
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(requestLogger);
 
-app.post("/signup", userCredentialsValidator, postNewUser);
-app.post("/signin", userCredentialsValidator, login);
+app.post('/signup', userCredentialsValidator, postNewUser);
+app.post('/signin', userCredentialsValidator, login);
 
 app.use(auth);
 
-app.use("/", usersRoute);
-app.use("/", articalsRoute);
+app.use(indexRoute);
 
-app.use("*", function (req, res) {
-  res.status(404).send({ message: "The requested resource was not found" });
+app.use('*', () => {
+  throw new NotFoundError('The requested resource was not found');
 });
 
 app.use(errorLogger);
 app.use(errors());
 
 app.use((err, req, res, next) => {
-  console.log(err);
   const { statusCode = 500, message } = err;
   res.status(statusCode).send({
-    message: statusCode === 500 ? "An error occurred on the server" : message,
+    message: statusCode === 500 ? 'An error occurred on the server' : message,
   });
 });
 
