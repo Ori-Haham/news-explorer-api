@@ -4,7 +4,7 @@ const {
   BadRequestError,
   NotFoundError,
   NoPermissionError,
-} = require('../errors/errorClasses');
+} = require('../errors/indexErrors');
 
 module.exports.postNewArticle = (req, res, next) => {
   const { keyword, title, text, date, source, link, image } = req.body;

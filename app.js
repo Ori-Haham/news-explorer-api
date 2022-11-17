@@ -15,7 +15,7 @@ const { userCredentialsValidator } = require('./middleware/userValidators');
 const { requestLogger, errorLogger } = require('./middleware/logger');
 const auth = require('./middleware/auth');
 const indexRoute = require('./routes/index');
-const { NotFoundError } = require('./errors/errorClasses');
+const { NotFoundError } = require('./errors/indexErrors');
 const apiLimiter = require('./middleware/apiLimiter');
 
 mongoose.connect(DB_ADDRESS);

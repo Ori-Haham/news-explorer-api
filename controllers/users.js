@@ -15,7 +15,7 @@ const {
   BadRequestError,
   UnauthorizedError,
   NotFoundError,
-} = require('../errors/errorClasses');
+} = require('../errors/indexErrors');
 
 function bcryptCompare(password, user) {
   return bcrypt.compare(password, user.password).then((matched) => {
@@ -81,23 +81,5 @@ module.exports.getUser = (req, res, next) => {
       const { password, _id, ...userObj } = user._doc;
       res.send(userObj);
     })
-    .catch(next);
-};
-
-module.exports.deleteUser = (req, res, next) => {
-  User.findByIdAndRemove(req.params.userId)
-    .orFail(new NotFoundError('No article with matching ID found'))
-    .then((article) => {
-      res.send(article);
-    })
-    .catch(next);
-};
-
-module.exports.getUsers = (req, res, next) => {
-  User.find({})
-    .orFail(() => {
-      throw new NotFoundError('No users found');
-    })
-    .then((users) => res.send({ users }))
     .catch(next);
 };
