@@ -16,9 +16,9 @@ const articalValidator = celebrate({
     keyword: Joi.string().required(),
     title: Joi.string().required(),
     text: Joi.string().required(),
-    date: Joi.string(),
+    date: Joi.string().required(),
     link: Joi.string().required().custom(validateUrl),
-    source: Joi.string().required().custom(validateUrl),
+    source: Joi.string().required(),
     image: Joi.string().required().custom(validateUrl),
   }),
 });

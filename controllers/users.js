@@ -1,10 +1,7 @@
 const bcrypt = require('bcryptjs');
 require('dotenv').config();
 
-const {
-  JWT_SECRET = `286fbdf86a49634871fcf6c92348bc46e93d22cc06bf22a18662fa7781690acd8f5113973e5bb9375b8990675d3372ac37102a9bfb1ac383d3b43
-fd66780e610`,
-} = process.env;
+const { JWT_SECRET = 'dev-secret' } = process.env;
 
 const jwt = require('jsonwebtoken');
 
@@ -47,7 +44,6 @@ module.exports.postNewUser = (req, res, next) => {
         } else if (err.name === 'MongoServerError') {
           next(new ConflictError('This email already exist'));
         } else {
-          console.log(err);
           next(err);
         }
       }),
@@ -60,15 +56,12 @@ module.exports.login = (req, res, next) => {
   User.findOne({ email })
     .orFail(new UnauthorizedError('Incorrect email or password'))
     .select('+password')
-    .then((user) => {
-      return bcryptCompare(password, user);
-    })
+    .then((user) => bcryptCompare(password, user))
     .then((user) => {
       const token = jwt.sign({ token: user._id }, JWT_SECRET, {
         expiresIn: '7d',
       });
-      const jsonToken = JSON.stringify(token);
-      res.send(jsonToken);
+      res.send({ token });
     })
     .catch(next);
 };

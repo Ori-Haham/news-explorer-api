@@ -1,10 +1,17 @@
 const { celebrate, Joi, Segments } = require('celebrate');
 
-const userCredentialsValidator = celebrate({
+const userDataValidator = celebrate({
   [Segments.BODY]: Joi.object().keys({
     email: Joi.string().required().email(),
     password: Joi.string().min(8).max(30),
     name: Joi.string().min(2).max(30).required(),
+  }),
+});
+
+const loginValidator = celebrate({
+  [Segments.BODY]: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().min(8).max(30),
   }),
 });
 
@@ -15,6 +22,7 @@ const userIdValidator = celebrate({
 });
 
 module.exports = {
-  userCredentialsValidator,
+  userDataValidator,
+  loginValidator,
   userIdValidator,
 };
