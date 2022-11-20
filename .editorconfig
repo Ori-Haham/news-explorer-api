@@ -24,6 +24,15 @@ charset = utf-8
 # Possible values - true, false
 trim_trailing_whitespace = true
 
+quote_type = single
+
+prettier.trailingComma= es5
+
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+end_of_line = lf
+multiline = always
 [*.md]
 trim_trailing_whitespace = false
 
@@ -31,5 +40,8 @@ trim_trailing_whitespace = false
 # Possible values - true, false
 insert_final_newline = true
 
-quote_type = single
-prettier.trailingComma= es5
+
+
+
+
+
